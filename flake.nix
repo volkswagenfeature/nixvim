@@ -38,6 +38,8 @@
           (system:
             let
               pkgs = import nixpkgs { inherit system; };
+              makeNixvim = import ./wrappers/standalone.nix pkgs (modules pkgs);
+
             in
             {
               packages.docs = import ./docs {
@@ -46,8 +48,22 @@
                 nixvimModules = nixvimModules;
                 inherit nmdSrc;
               };
+              packages.default = makeNixvim {
+                plugins = {
+                  magma-nvim.enable = true;
+                };
+                options = {
 
-              legacyPackages.makeNixvim = import ./wrappers/standalone.nix pkgs (modules pkgs);
+
+                };
+                globals = {
+                  magma_image_provider = "kitty";
+                  magma_output_window_borders = false;
+                  magma_show_mimetype_debug = true;
+                };
+              };
+
+              legacyPackages.makeNixvim = makeNixvim;
             });
     in
     flakeOutput // {
